@@ -1,5 +1,6 @@
 %define		modname tinymce
 Summary:	Drupal TinyMCE WYSIWYG Editor Module
+Summary(pl):	Modu³ edytora WYSIWYG TinyMCE dla Drupala
 Name:		drupal-mod-%{modname}
 Version:	4.6.0
 Release:	0.1
@@ -24,6 +25,16 @@ Features include:
 - Drupal image upload integration
 - Dynamically turn off/on TinyMCE per textarea field
 - Assign different tinymce profiles per role
+
+%description -l pl
+Ten modu³ pozwala u¿ywaæ edytora WYSIWYG TinyMCE do modyfikowania
+tre¶ci stron. Jest to wspólny projekt, który stworzyli richardb,
+mathias i jjeff.
+
+Mo¿liwo¶ci obejmuj±:
+- integracjê umieszczania obrazków w Drupalu
+- dynamiczne wy³±czanie/w³±czanie TinyMCE dla pól textarea
+- przypisywanie ró¿nych profili tinymce dla ról
 
 %prep
 %setup -q -n %{modname}
