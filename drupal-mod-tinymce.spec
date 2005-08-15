@@ -3,7 +3,7 @@ Summary:	Drupal TinyMCE WYSIWYG Editor Module
 Summary(pl):	Modu³ edytora WYSIWYG TinyMCE dla Drupala
 Name:		drupal-mod-%{modname}
 Version:	4.6.0
-Release:	0.16
+Release:	0.20
 Epoch:		0
 License:	GPL
 Group:		Applications/WWW
@@ -20,7 +20,6 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/drupal
 %define		_moddir		%{_datadir}/drupal/modules
-%define		_htmlmoddir	%{_datadir}/drupal/htdocs/modules
 %define		_tinymceplugindir	%{_datadir}/tinymce/plugins
 
 %description
@@ -52,16 +51,15 @@ $,,'
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_moddir},%{_htmlmoddir}}
+install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_moddir}}
 install -d $RPM_BUILD_ROOT%{_tinymceplugindir}
 
 install *.module $RPM_BUILD_ROOT%{_moddir}
 cp -a plugins/* $RPM_BUILD_ROOT%{_tinymceplugindir}
 install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/apache-%{modname}.conf
 
-install -d $RPM_BUILD_ROOT%{_htmlmoddir}/tinymce/jscripts
-ln -s %{_datadir}/tinymce $RPM_BUILD_ROOT%{_htmlmoddir}/tinymce/jscripts/tiny_mce
-ln -s ../htdocs/modules/tinymce $RPM_BUILD_ROOT%{_moddir}/tinymce
+install -d $RPM_BUILD_ROOT%{_moddir}/tinymce/jscripts
+ln -s %{_datadir}/tinymce $RPM_BUILD_ROOT%{_moddir}/tinymce/jscripts/tiny_mce
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -75,11 +73,28 @@ zcat %{_docdir}/%{name}-%{version}/tinymce.mysql.gz | mysql drupal
 EOF
 fi
 
+%triggerin -- apache1 >= 1.3.33-2
+# install it only if this apache instance has drupal configured
+if [ -L /etc/apache/conf.d/??_drupal.conf ]; then
+	%apache_config_install -v 1 -c %{_sysconfdir}/apache-%{modname}.conf
+fi
+
+%triggerun -- apache1 >= 1.3.33-2
+%apache_config_uninstall -v 1
+
+%triggerin -- apache >= 2.0.0
+# install it only if this apache instance has drupal configured
+if [ -L /etc/httpd/httpd.conf/??_drupal.conf ]; then
+	%apache_config_install -v 2 -c %{_sysconfdir}/apache-%{modname}.conf
+fi
+
+%triggerun -- apache >= 2.0.0
+%apache_config_uninstall -v 2
+
 %files
 %defattr(644,root,root,755)
 %doc *.txt tinymce.{mysql,pgsql}
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/*.conf
 %{_moddir}/*.module
 %{_moddir}/tinymce
-%{_htmlmoddir}/tinymce
 %{_tinymceplugindir}/*
