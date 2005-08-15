@@ -3,7 +3,7 @@ Summary:	Drupal TinyMCE WYSIWYG Editor Module
 Summary(pl):	Modu³ edytora WYSIWYG TinyMCE dla Drupala
 Name:		drupal-mod-%{modname}
 Version:	4.6.0
-Release:	0.15
+Release:	0.16
 Epoch:		0
 License:	GPL
 Group:		Applications/WWW
@@ -20,7 +20,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/drupal
 %define		_moddir		%{_datadir}/drupal/modules
-%define		_htmldir	%{_datadir}/drupal/htdocs/modules
+%define		_htmlmoddir	%{_datadir}/drupal/htdocs/modules
 %define		_tinymceplugindir	%{_datadir}/tinymce/plugins
 
 %description
@@ -52,15 +52,15 @@ $,,'
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_moddir},%{_htmldir}}
+install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_moddir},%{_htmlmoddir}}
 install -d $RPM_BUILD_ROOT%{_tinymceplugindir}
 
 install *.module $RPM_BUILD_ROOT%{_moddir}
 cp -a plugins/* $RPM_BUILD_ROOT%{_tinymceplugindir}
 install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/apache-%{modname}.conf
 
-install -d $RPM_BUILD_ROOT%{_htmldir}/tinymce/jscripts
-ln -s %{_datadir}/tinymce $RPM_BUILD_ROOT%{_htmldir}/tinymce/jscripts/tiny_mce
+install -d $RPM_BUILD_ROOT%{_htmlmoddir}/tinymce/jscripts
+ln -s %{_datadir}/tinymce $RPM_BUILD_ROOT%{_htmlmoddir}/tinymce/jscripts/tiny_mce
 ln -s ../htdocs/modules/tinymce $RPM_BUILD_ROOT%{_moddir}/tinymce
 
 %clean
@@ -81,5 +81,5 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/*.conf
 %{_moddir}/*.module
 %{_moddir}/tinymce
-%{_htmldir}/tinymce
+%{_htmlmoddir}/tinymce
 %{_tinymceplugindir}/*
