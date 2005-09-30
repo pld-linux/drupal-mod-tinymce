@@ -3,8 +3,7 @@ Summary:	Drupal TinyMCE WYSIWYG Editor Module
 Summary(pl):	Modu³ edytora WYSIWYG TinyMCE dla Drupala
 Name:		drupal-mod-%{modname}
 Version:	4.6.0
-Release:	0.20
-Epoch:		0
+Release:	0.23
 License:	GPL
 Group:		Applications/WWW
 Source0:	http://drupal.org/files/projects/%{modname}-%{version}.tar.gz
@@ -19,7 +18,8 @@ BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/drupal
-%define		_moddir		%{_datadir}/drupal/modules
+%define		_drupaldir	%{_datadir}/drupal
+%define		_moddir		%{_drupaldir}/modules
 %define		_tinymceplugindir	%{_datadir}/tinymce/plugins
 
 %description
