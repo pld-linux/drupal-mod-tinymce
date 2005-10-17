@@ -3,7 +3,7 @@ Summary:	Drupal TinyMCE WYSIWYG Editor Module
 Summary(pl):	Modu³ edytora WYSIWYG TinyMCE dla Drupala
 Name:		drupal-mod-%{modname}
 Version:	4.6.0
-Release:	0.23
+Release:	0.24
 License:	GPL
 Group:		Applications/WWW
 Source0:	http://drupal.org/files/projects/%{modname}-%{version}.tar.gz
@@ -20,6 +20,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir	/etc/drupal
 %define		_drupaldir	%{_datadir}/drupal
 %define		_moddir		%{_drupaldir}/modules
+%define		_htdocs		%{_drupaldir}/htdocs
+%define		_htmlmoddir	%{_htdocs}/modules/%{modname}
 %define		_tinymceplugindir	%{_datadir}/tinymce/plugins
 
 %description
@@ -61,6 +63,11 @@ install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/apache-%{modname}.conf
 install -d $RPM_BUILD_ROOT%{_moddir}/tinymce/jscripts
 ln -s %{_datadir}/tinymce $RPM_BUILD_ROOT%{_moddir}/tinymce/jscripts/tiny_mce
 
+# need symlink for drupal to think the file is there, we also do
+# apache alias as the symlinks aren't usually allowed in htdocs
+install -d $RPM_BUILD_ROOT%{_htmlmoddir}/jscripts
+ln -s %{_datadir}/tinymce $RPM_BUILD_ROOT%{_htmlmoddir}/jscripts/tiny_mce
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -98,3 +105,4 @@ fi
 %{_moddir}/*.module
 %{_moddir}/tinymce
 %{_tinymceplugindir}/*
+%{_htmlmoddir}
