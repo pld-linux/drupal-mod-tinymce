@@ -3,21 +3,24 @@ Summary:	Drupal TinyMCE WYSIWYG Editor Module
 Summary(pl):	Modu³ edytora WYSIWYG TinyMCE dla Drupala
 Name:		drupal-mod-%{modname}
 Version:	4.6.0
-Release:	0.24
+Release:	0.25
 License:	GPL
 Group:		Applications/WWW
 Source0:	http://drupal.org/files/projects/%{modname}-%{version}.tar.gz
 # Source0-md5:	dd7630860baf1f7f470d71c272d275eb
 Source1:	%{name}.conf
 URL:		http://drupal.org/project/tinymce
-BuildRequires:	rpmbuild(macros) >= 1.194
+BuildRequires:	rpmbuild(macros) >= 1.264
 BuildRequires:	sed >= 4.0
+Requires:	webapps >= 0.2
 Requires:	drupal >= 4.6.0
 Requires:	tinymce >= 1.44
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_sysconfdir	/etc/drupal
+%define		_webapps	/etc/webapps
+%define		_webapp		drupal/%{modname}
+%define		_sysconfdir	%{_webapps}/%{_webapp}
 %define		_drupaldir	%{_datadir}/drupal
 %define		_moddir		%{_drupaldir}/modules
 %define		_htdocs		%{_drupaldir}/htdocs
@@ -58,7 +61,8 @@ install -d $RPM_BUILD_ROOT%{_tinymceplugindir}
 
 install *.module $RPM_BUILD_ROOT%{_moddir}
 cp -a plugins/* $RPM_BUILD_ROOT%{_tinymceplugindir}
-install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/apache-%{modname}.conf
+install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/apache.conf
+install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 
 install -d $RPM_BUILD_ROOT%{_moddir}/tinymce/jscripts
 ln -s %{_datadir}/tinymce $RPM_BUILD_ROOT%{_moddir}/tinymce/jscripts/tiny_mce
@@ -80,28 +84,64 @@ zcat %{_docdir}/%{name}-%{version}/tinymce.mysql.gz | mysql drupal
 EOF
 fi
 
-%triggerin -- apache1 >= 1.3.33-2
-# install it only if this apache instance has drupal configured
-if [ -L /etc/apache/conf.d/??_drupal.conf ]; then
-	%apache_config_install -v 1 -c %{_sysconfdir}/apache-%{modname}.conf
-fi
+%triggerin -- apache1
+# TODO install it only if this apache instance has drupal configured
+%webapp_register apache %{_webapp}
 
-%triggerun -- apache1 >= 1.3.33-2
-%apache_config_uninstall -v 1
+%triggerun -- apache1
+%webapp_unregister apache %{_webapp}
 
 %triggerin -- apache >= 2.0.0
-# install it only if this apache instance has drupal configured
-if [ -L /etc/httpd/httpd.conf/??_drupal.conf ]; then
-	%apache_config_install -v 2 -c %{_sysconfdir}/apache-%{modname}.conf
-fi
+# TODO install it only if this apache instance has drupal configured
+%webapp_register httpd %{_webapp}
 
 %triggerun -- apache >= 2.0.0
-%apache_config_uninstall -v 2
+%webapp_unregister httpd %{_webapp}
+
+%triggerpostun -- %{name} < 4.6.0-0.25
+# migrate from apache-config macros
+if [ -f /etc/drupal/apache-tinymce.conf.rpmsave ]; then
+	if [ -d /etc/apache/webapps.d ]; then
+		cp -f %{_sysconfdir}/apache.conf{,.rpmnew}
+		cp -f /etc/drupal/apache-tinymce.conf.rpmsave %{_sysconfdir}/apache.conf
+	fi
+
+	if [ -d /etc/httpd/webapps.d ]; then
+		cp -f %{_sysconfdir}/httpd.conf{,.rpmnew}
+		cp -f /etc/drupal/apache-tinymce.conf.rpmsave %{_sysconfdir}/httpd.conf
+	fi
+	rm -f /etc/drupal/apache-tinymce.conf.rpmsave
+fi
+
+# place new config location, as trigger puts config only on first install, do it here.
+if [ -L /etc/apache/conf.d/99_%{name}.conf ]; then
+	rm -f /etc/apache/conf.d/99_%{name}.conf
+	/usr/sbin/webapp register apache %{_webapp}
+	apache_reload=1
+fi
+if [ -L /etc/httpd/httpd.conf/99_%{name}.conf ]; then
+	rm -f /etc/httpd/httpd.conf/99_%{name}.conf
+	/usr/sbin/webapp register httpd %{_webapp}
+	httpd_reload=1
+fi
+
+if [ "$httpd_reload" ]; then
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd reload 1>&2
+	fi
+fi
+if [ "$apache_reload" ]; then
+	if [ -f /var/lock/subsys/apache ]; then
+		/etc/rc.d/init.d/apache reload 1>&2
+	fi
+fi
 
 %files
 %defattr(644,root,root,755)
 %doc *.txt tinymce.{mysql,pgsql}
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/*.conf
+%dir %attr(750,root,http) %{_sysconfdir}
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/apache.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf
 %{_moddir}/*.module
 %{_moddir}/tinymce
 %{_tinymceplugindir}/*
