@@ -3,11 +3,11 @@ Summary:	Drupal TinyMCE WYSIWYG Editor Module
 Summary(pl):	Modu³ edytora WYSIWYG TinyMCE dla Drupala
 Name:		drupal-mod-%{modname}
 Version:	4.6.0
-Release:	0.25
+Release:	0.26
 License:	GPL
 Group:		Applications/WWW
 Source0:	http://drupal.org/files/projects/%{modname}-%{version}.tar.gz
-# Source0-md5:	dd7630860baf1f7f470d71c272d275eb
+# Source0-md5:	050b885a5437c492f2e9d49181db9326
 Source1:	%{name}.conf
 URL:		http://drupal.org/project/tinymce
 BuildRequires:	rpmbuild(macros) >= 1.264
@@ -51,8 +51,7 @@ Mo¿liwo¶ci obejmuj±:
 rm -f LICENSE.txt # pure GPL
 
 # undos the source
-find '(' -name '*.txt' ')' -print0 | xargs -0 sed -i -e 's,
-$,,'
+find '(' -name '*.txt' ')' -print0 | xargs -0 sed -i -e 's,\r$,,'
 
 %install
 rm -rf $RPM_BUILD_ROOT
