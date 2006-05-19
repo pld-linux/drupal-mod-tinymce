@@ -1,3 +1,5 @@
+# TODO
+# - webapps: register this pkg only if this webserver instance has drupal webapp configured
 %define		modname tinymce
 Summary:	Drupal TinyMCE WYSIWYG Editor Module
 Summary(pl):	Modu³ edytora WYSIWYG TinyMCE dla Drupala
@@ -12,9 +14,9 @@ Source1:	%{name}.conf
 URL:		http://drupal.org/project/tinymce
 BuildRequires:	rpmbuild(macros) >= 1.264
 BuildRequires:	sed >= 4.0
-Requires:	webapps >= 0.2
 Requires:	drupal >= 4.6.0
 Requires:	tinymce >= 1.44
+Requires:	webapps >= 0.2
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -91,49 +93,10 @@ fi
 %webapp_unregister apache %{_webapp}
 
 %triggerin -- apache < 2.2.0, apache-base
-# TODO install it only if this apache instance has drupal configured
 %webapp_register httpd %{_webapp}
 
 %triggerun -- apache < 2.2.0, apache-base
 %webapp_unregister httpd %{_webapp}
-
-%triggerpostun -- %{name} < 4.6.0-0.25
-# migrate from apache-config macros
-if [ -f /etc/drupal/apache-tinymce.conf.rpmsave ]; then
-	if [ -d /etc/apache/webapps.d ]; then
-		cp -f %{_sysconfdir}/apache.conf{,.rpmnew}
-		cp -f /etc/drupal/apache-tinymce.conf.rpmsave %{_sysconfdir}/apache.conf
-	fi
-
-	if [ -d /etc/httpd/webapps.d ]; then
-		cp -f %{_sysconfdir}/httpd.conf{,.rpmnew}
-		cp -f /etc/drupal/apache-tinymce.conf.rpmsave %{_sysconfdir}/httpd.conf
-	fi
-	rm -f /etc/drupal/apache-tinymce.conf.rpmsave
-fi
-
-# place new config location, as trigger puts config only on first install, do it here.
-if [ -L /etc/apache/conf.d/99_%{name}.conf ]; then
-	rm -f /etc/apache/conf.d/99_%{name}.conf
-	/usr/sbin/webapp register apache %{_webapp}
-	apache_reload=1
-fi
-if [ -L /etc/httpd/httpd.conf/99_%{name}.conf ]; then
-	rm -f /etc/httpd/httpd.conf/99_%{name}.conf
-	/usr/sbin/webapp register httpd %{_webapp}
-	httpd_reload=1
-fi
-
-if [ "$httpd_reload" ]; then
-	if [ -f /var/lock/subsys/httpd ]; then
-		/etc/rc.d/init.d/httpd reload 1>&2
-	fi
-fi
-if [ "$apache_reload" ]; then
-	if [ -f /var/lock/subsys/apache ]; then
-		/etc/rc.d/init.d/apache reload 1>&2
-	fi
-fi
 
 %files
 %defattr(644,root,root,755)
