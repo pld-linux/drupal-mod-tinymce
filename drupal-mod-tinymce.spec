@@ -2,7 +2,7 @@
 # - webapps: register this pkg only if this webserver instance has drupal webapp configured
 %define		modname tinymce
 Summary:	Drupal TinyMCE WYSIWYG Editor Module
-Summary(pl):	Modu³ edytora WYSIWYG TinyMCE dla Drupala
+Summary(pl.UTF-8):   ModuÅ‚ edytora WYSIWYG TinyMCE dla Drupala
 Name:		drupal-mod-%{modname}
 Version:	4.6.0
 Release:	1
@@ -39,15 +39,15 @@ Features include:
 - Dynamically turn off/on TinyMCE per textarea field
 - Assign different tinymce profiles per role
 
-%description -l pl
-Ten modu³ pozwala u¿ywaæ edytora WYSIWYG TinyMCE do modyfikowania
-tre¶ci stron. Jest to wspólny projekt, który stworzyli richardb,
+%description -l pl.UTF-8
+Ten moduÅ‚ pozwala uÅ¼ywaÄ‡ edytora WYSIWYG TinyMCE do modyfikowania
+treÅ›ci stron. Jest to wspÃ³lny projekt, ktÃ³ry stworzyli richardb,
 mathias i jjeff.
 
-Mo¿liwo¶ci obejmuj±:
-- integracjê umieszczania obrazków w Drupalu
-- dynamiczne wy³±czanie/w³±czanie TinyMCE dla pól textarea
-- przypisywanie ró¿nych profili tinymce dla ról
+MoÅ¼liwoÅ›ci obejmujÄ…:
+- integracjÄ™ umieszczania obrazkÃ³w w Drupalu
+- dynamiczne wyÅ‚Ä…czanie/wÅ‚Ä…czanie TinyMCE dla pÃ³l textarea
+- przypisywanie rÃ³Å¼nych profili tinymce dla rÃ³l
 
 %prep
 %setup -q -n %{modname}
