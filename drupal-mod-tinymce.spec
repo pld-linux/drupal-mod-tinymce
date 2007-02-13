@@ -2,7 +2,7 @@
 # - webapps: register this pkg only if this webserver instance has drupal webapp configured
 %define		modname tinymce
 Summary:	Drupal TinyMCE WYSIWYG Editor Module
-Summary(pl.UTF-8):   Moduł edytora WYSIWYG TinyMCE dla Drupala
+Summary(pl.UTF-8):	Moduł edytora WYSIWYG TinyMCE dla Drupala
 Name:		drupal-mod-%{modname}
 Version:	4.6.0
 Release:	1
